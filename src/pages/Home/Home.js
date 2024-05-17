@@ -8,8 +8,9 @@ import Banner from './component/Banner/Banner'
 import CategoryBar from './component/categoryBar/CategoryBar'
 import ListProduct from '../../componets/listProduct/ListProduct'
 import Pagination from '../../componets/pagination/Pagination'
-import products from '../../data'
-import AxiosRequest from '../../API/Axios'
+import { useDispatch, useSelector, shallowEqual } from 'react-redux'
+import { fetchRequest } from '../../saga/Products/Products.Action'
+// import AxiosRequest from '../../API/Axios'
 
 const HomeMain = styled.div`
   display: grid;
@@ -25,70 +26,39 @@ const MainContentStyled = styled.div`
 `
 
 const Home = () => {
-  const [productsState, setProductsState] = useState(products)
-  const [page, setPage] = useState(1)
-  const [search, setSearch] = useState('')
+  const prod = useSelector((state) => {
+    return state.productsReducer?.products
+  }, shallowEqual)
 
-  const handleChangePage = (value) => {
-    setPage(Number(value))
-  }
-
-  const handleGetValueSearch = (value) => {
-    setSearch(value)
-  }
-  //tìm kiếm sản phẩm dựa trên từ khóa tìm kiếm hiện tại.
-
-  const handleSearch = () => {
-    const newProducts = products.filter((product) =>
-      product.title.toLowerCase().includes(search.toLowerCase())
-    )
-    console.log(newProducts)
-    setProductsState(newProducts)
-    setPage(1)
-  }
-  const handleCategorySelect = (nav) => {
-    if (nav === 'ALL') {
-      setProductsState(products)
-    } else {
-      const newProducts = products.filter((product) => product.type === nav)
-      setProductsState(newProducts)
-    }
-    setPage(1)
-  }
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    const fetchProducts = async () => {
-    const productList = await AxiosRequest.get('api/product/get-all')
-    console.log(productList)
-    }
-    fetchProducts()
+    ;(async () => {
+      await dispatch(fetchRequest({}))
+    })()
   }, [])
+
   return (
     <>
       <Logo />
       <HeaderSearch
-        onSearch={handleGetValueSearch}
-        search={search}
-        handleSearch={handleSearch}
+      // onSearch={handleGetValueSearch}
+      // search={search}
+      // handleSearch={handleSearch}
       />
-      <HorizontalCategory onNav={handleCategorySelect} />
+      <HorizontalCategory />
       <About />
       <Banner />
       <HomeMain>
         <CategoryBar />
         <MainContentStyled>
-          <ListProduct
-            page={page}
-            limit={12}
-            setProductsState={setProductsState}
-            products={productsState}
-          />
+          <ListProduct products={prod} />
 
-          <Pagination
+          {/* <Pagination
             total={productsState.length}
             pageSize={12}
             onChange={handleChangePage}
-          />
+          /> */}
         </MainContentStyled>
       </HomeMain>
     </>

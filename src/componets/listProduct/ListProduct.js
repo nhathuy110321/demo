@@ -5,6 +5,7 @@ import Button from '../common/button/Button'
 import Input from '../common/form/input/Input'
 import { FormProvider, useForm } from 'react-hook-form'
 import Modal from '../../pages/Home/component/Modal/Modal'
+import AxiosRequest from '../../API/Axios'
 
 const ProductListStyled = styled.div`
   display: grid;
@@ -34,6 +35,7 @@ const FormUpdateStyled = styled.div`
   .ant-input {
     width: 100% !important;
   }
+
   #description {
     font-size: 1.2rem;
     border-color: ${({ theme }) => theme.primary} !important ;
@@ -44,7 +46,7 @@ const ListProduct = ({ page, limit, products, setProductsState }) => {
 
   const methodsModalAdd = useForm({
     defaultValues: {
-      imgProduct: '',
+      imageUrl: '',
       title: '',
       price: '',
       likedCount: '',
@@ -53,8 +55,7 @@ const ListProduct = ({ page, limit, products, setProductsState }) => {
   })
   const [modal, setModal] = useState({
     isOpen: false,
-    title: '',
-    content: '',
+
     handleOk: () => {},
     handleCancel: () => {},
   })
@@ -66,11 +67,10 @@ const ListProduct = ({ page, limit, products, setProductsState }) => {
       content: (
         <FormProvider {...methodsModalAdd}>
           <FormUpdateStyled>
-            <Input name={'imgProduct'} labelname={'Image URL:'} />
+            <Input name={'imageUrl'} labelname={'Image URL:'} />
             <Input name={'title'} labelname={'title:'} />
             <Input name={'price'} labelname={'Price:'} />
             <Input name={'likedCount'} labelname={'Liked Count:'} />
-
             <>
               <LabelStyled htmlFor='description'>Description:</LabelStyled>
               <Input
@@ -83,24 +83,32 @@ const ListProduct = ({ page, limit, products, setProductsState }) => {
                 }}
               />
             </>
+            <Input name={'username'} labelname={'username:'} />
           </FormUpdateStyled>
         </FormProvider>
       ),
-      handleOk: () => {
+      handleOk: async () => {
         const newData = methodsModalAdd.getValues()
         newData.id = products.length + 1
-        const newDataState = [newData, ...products]
-        setProductsState(newDataState)
-        methodsModalAdd.reset()
+        try {
+          await AxiosRequest.post(`products`, { ...newData })
+          const newDataState = [newData, ...products]
+          setProductsState(newDataState)
 
-        handleHideModal()
+          methodsModalAdd.reset()
+          handleCancel()
+        } catch (error) {
+          console.error('Error deleting product:', error)
+        }
+        handleCancel()
       },
-      handleCancel: handleHideModal,
+      handleCancel,
     })
   }
-  const handleHideModal = () => {
+  const handleCancel = () => {
     setModal({ ...modal, isOpen: false })
   }
+  console.log(products)
   return (
     <div>
       {modal.isOpen && <Modal {...modal} />}
@@ -111,19 +119,15 @@ const ListProduct = ({ page, limit, products, setProductsState }) => {
         </Button>
       </AddCardStyled>
       <ProductListStyled>
-        {products.map((product, index) => {
-          const skip = (page - 1) * limit
-          if ((index >= skip) & (index < skip + limit)) {
-            return (
-              <ProductCard
-                key={product.id}
-                product={product}
-                setDataState={setProductsState}
-                dataState={products}
-              />
-            )
-          }
-          return null
+        {products?.map((product, index) => {
+          return (
+            <ProductCard
+              key={product.id}
+              product={product}
+              setDataState={setProductsState}
+              dataState={products}
+            />
+          )
         })}
       </ProductListStyled>
     </div>

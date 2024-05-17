@@ -1,5 +1,5 @@
-import { Pagination as BasePagination } from "antd";
-import styled from "styled-components";
+import { Pagination as BasePagination } from 'antd'
+import styled from 'styled-components'
 
 const PaginationStyled = styled(BasePagination)`
   display: flex;
@@ -48,11 +48,10 @@ const PaginationStyled = styled(BasePagination)`
       }
     }
   }
-`;
-
+`
 
 const Pagination = ({ ...props }) => {
-  return <PaginationStyled {...props} />;
-};
+  return <PaginationStyled {...props} />
+}
 
-export default Pagination;
+export default Pagination

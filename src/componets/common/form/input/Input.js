@@ -1,7 +1,7 @@
-import { Input as BaseInput } from "antd";
-import styled from "styled-components";
-import { Controller, useController, useFormContext } from "react-hook-form";
-const { TextArea } = BaseInput;
+import { Input as BaseInput } from 'antd'
+import styled from 'styled-components'
+import { Controller, useController, useFormContext } from 'react-hook-form'
+const { TextArea } = BaseInput
 
 const FormControl = styled.div`
   position: relative;
@@ -15,7 +15,12 @@ const FormControl = styled.div`
       padding-left: 80px;
     }
   }
-`;
+  /* &#id {
+    & > input {
+      display: none;
+    }
+  } */
+`
 
 const InputStyled = styled(BaseInput)`
   padding: 0 20px;
@@ -31,11 +36,11 @@ const InputStyled = styled(BaseInput)`
     border-color: ${({ theme }) => theme.primary};
     box-shadow: 0 0 0 2px rgba(106, 152, 60, 0.1);
   }
-`;
+`
 const TextAreaStyled = styled(TextArea)`
   height: auto;
   width: 100%;
-`;
+`
 
 const LabelStyled = styled.label`
   display: inline-block;
@@ -45,7 +50,7 @@ const LabelStyled = styled.label`
   margin-bottom: 10px;
 
   color: ${({ theme }) => theme.textPrimary};
-`;
+`
 
 const IconStyled = styled.div`
   position: absolute;
@@ -57,19 +62,19 @@ const IconStyled = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-`;
+`
 const ErrorStyled = styled.span`
   display: inline-block;
   margin: 5px 0;
   color: ${({ theme }) => theme.textRed};
-`;
+`
 
-const Input = ({ labelname, name, icon, type = "text", ...props }) => {
-  const { control } = useFormContext();
+const Input = ({ labelname, name, icon, type = 'text', ...props }) => {
+  const { control } = useFormContext()
 
   const {
     fieldState: { error },
-  } = useController({ name, control });
+  } = useController({ name, control })
   return (
     <>
       <FormControl>
@@ -77,10 +82,10 @@ const Input = ({ labelname, name, icon, type = "text", ...props }) => {
         <Controller
           name={name}
           control={control}
-          defaultValue=""
+          defaultValue=''
           render={({ field }) => (
             <>
-              {type !== "textarea" ? (
+              {type !== 'textarea' ? (
                 <InputStyled id={name} {...field} type={type} {...props} />
               ) : (
                 <TextAreaStyled id={name} {...field} type={type} {...props} />
@@ -92,15 +97,15 @@ const Input = ({ labelname, name, icon, type = "text", ...props }) => {
       </FormControl>
       {!!error && (
         <ErrorStyled>
-          {error.message.split("|").map((err) => (
-            <span key={err} style={{ display: "block" }}>
+          {error.message.split('|').map((err) => (
+            <span key={err} style={{ display: 'block' }}>
               {err}
             </span>
           ))}
         </ErrorStyled>
       )}
     </>
-  );
-};
+  )
+}
 
-export default Input;
+export default Input

@@ -18,7 +18,7 @@ class AxiosClient {
       timeoutErrorMessage: SYSTEM_ERROR.TIMEOUT_ERROR.MESSAGE,
     })
 
-    this._initializeResponseInterceptor ()
+    this._initializeResponseInterceptor()
   }
 
   getToken() {
