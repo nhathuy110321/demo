@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
+
 import { Logo } from '../../componets'
-import HeaderSearch from './component/HeaderSearch/HeaderSearch'
-import HorizontalCategory from './component/HorizontalCategory/HorizontalCategory'
+import ListProduct from '../../componets/listProduct/ListProduct'
 import About from './component/About/About'
 import Banner from './component/Banner/Banner'
 import CategoryBar from './component/categoryBar/CategoryBar'
-import ListProduct from '../../componets/listProduct/ListProduct'
+import HeaderSearch from './component/HeaderSearch/HeaderSearch'
 import Pagination from '../../componets/pagination/Pagination'
-import { useDispatch, useSelector, shallowEqual } from 'react-redux'
+
+import HorizontalCategory from './component/HorizontalCategory/HorizontalCategory'
+
+import { useDispatch, useSelector } from 'react-redux'
+import { useEffect, useState } from 'react'
 import { fetchRequest } from '../../saga/Products/Products.Action'
-// import AxiosRequest from '../../API/Axios'
 
 const HomeMain = styled.div`
   display: grid;
@@ -24,20 +26,18 @@ const MainContentStyled = styled.div`
     text-align: right;
   }
 `
-
 const Home = () => {
-  const prod = useSelector((state) => {
-    return state.productsReducer?.products
-  }, shallowEqual)
-
   const dispatch = useDispatch()
+  // const products = useSelector((state) => {
+  //   return state.productsReducer?.products
+  // }, shallowEqual)
+  const product = useSelector((state) => state.product)
+  const [page, setPage] = useState(1)
 
   useEffect(() => {
-    ;(async () => {
-      await dispatch(fetchRequest({}))
-    })()
-  }, [])
-
+    console.log(page)
+    dispatch(fetchRequest({ page }))
+  }, [page])
   return (
     <>
       <Logo />
@@ -52,13 +52,14 @@ const Home = () => {
       <HomeMain>
         <CategoryBar />
         <MainContentStyled>
-          <ListProduct products={prod} />
+          <ListProduct products={product.products} />
 
-          {/* <Pagination
-            total={productsState.length}
-            pageSize={12}
-            onChange={handleChangePage}
-          /> */}
+          <Pagination
+            total={product.pagination.total}
+            onChange={(value) => setPage(value)}
+            current={product.pagination.currentPage}
+            pageSize={product.params.limit}
+          />
         </MainContentStyled>
       </HomeMain>
     </>

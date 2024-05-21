@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
-import AxiosRequest from '../../../../API/Axios'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchRequest } from '../../../../saga/Products/Products.Action'
 
 const StyledHorizontalCategory = styled.div`
   display: flex;
@@ -16,39 +16,39 @@ const LinkStyled = styled.a`
   font-weight: 700;
   cursor: pointer;
 `
+const categorys = [
+  {
+    label: 'ALL',
+    value: '',
+  },
+  {
+    label: 'BÀN PHÌM CƠ',
+    value: 'keyboard',
+  },
+  {
+    label: 'KEYCAP',
+    value: 'keycap',
+  },
+  {
+    label: 'SWITCH',
+    value: 'switch',
+  },
+]
+const HorizontalCategory = () => {
+  const dispatch = useDispatch()
+  const params = useSelector((state) => state.product.params)
 
-// const navCategory = ['ALL', 'GIÀY THỂ THAO', 'SNEAKER', 'CAO GÓT']
-const HorizontalCategory = ({ setDataPage }) => {
-  const [categoryState, setCategory] = useState([])
-
-  useEffect(() => {
-    const fetchCategory = async () => {
-      try {
-        const res = await AxiosRequest.get('category')
-        setCategory(res)
-      } catch (error) {
-        console.error('Error fetching products:', error)
-      }
-    }
-    fetchCategory()
-  }, [])
-
-  const handleAllProductsClick = () => {
-    setDataPage((prev) => ({ ...prev, category: '' }))
-  }
-
-  const handleCategoryClick = (id) => {
-    setDataPage((prev) => ({ ...prev, category: id }))
+  const handleFilterByCategory = (value) => {
+    dispatch(fetchRequest({ ...params, category: value }))
   }
   return (
     <StyledHorizontalCategory>
-      <LinkStyled onClick={handleAllProductsClick}>ALL</LinkStyled>
-      {categoryState.map((category) => (
+      {categorys.map((item) => (
         <LinkStyled
-          key={category.id}
-          onClick={() => handleCategoryClick(category.id)}
+          key={item.value}
+          onClick={() => handleFilterByCategory(item.value)}
         >
-          {category.name}
+          {item.label}
         </LinkStyled>
       ))}
     </StyledHorizontalCategory>

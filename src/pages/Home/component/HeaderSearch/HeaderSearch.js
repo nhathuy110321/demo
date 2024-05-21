@@ -1,7 +1,9 @@
-import React from "react";
-import { Button, Input } from "antd";
-import styled from "styled-components";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from '@ant-design/icons'
+import { Button, Input } from 'antd'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import styled from 'styled-components'
+import { fetchRequest } from '../../../../saga/Products/Products.Action'
 
 const StyledSearch = styled.div`
   padding: 15px 10px;
@@ -33,22 +35,30 @@ const StyledSearch = styled.div`
       background-color: ${(props) => props.theme.primary} !important;
     }
   }
-`;
+`
 
-const HeaderSearch = ({ onSearch, search, handleSearch }) => {
+const HeaderSearch = () => {
+  const product = useSelector((state) => state.product)
+
+  const dispatch = useDispatch()
+  const [search, setSearch] = useState('')
+
+  const handleSearch = () => {
+    dispatch(fetchRequest({ ...product.params, page: 1, search }))
+  }
   return (
     <StyledSearch>
       <Input
-        placeholder="キーワード"
-        type="text"
+        placeholder='キーワード'
+        type='text'
         value={search}
-        onChange={(e) => onSearch(e.target.value)}
+        onChange={(e) => setSearch(e.target.value)}
       />
-      <Button type="primary" onClick={handleSearch}>
+      <Button type='primary' onClick={handleSearch}>
         <SearchOutlined />
       </Button>
     </StyledSearch>
-  );
-};
+  )
+}
 
-export default HeaderSearch;
+export default HeaderSearch

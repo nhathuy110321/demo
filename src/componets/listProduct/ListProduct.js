@@ -5,7 +5,8 @@ import Button from '../common/button/Button'
 import Input from '../common/form/input/Input'
 import { FormProvider, useForm } from 'react-hook-form'
 import Modal from '../../pages/Home/component/Modal/Modal'
-import AxiosRequest from '../../API/Axios'
+import { patchRequest } from '../../saga/Products/Products.Action'
+import { useDispatch } from 'react-redux'
 
 const ProductListStyled = styled.div`
   display: grid;
@@ -41,8 +42,8 @@ const FormUpdateStyled = styled.div`
     border-color: ${({ theme }) => theme.primary} !important ;
   }
 `
-const ListProduct = ({ page, limit, products, setProductsState }) => {
-  //
+const ListProduct = ({ products }) => {
+  const dispatch = useDispatch()
 
   const methodsModalAdd = useForm({
     defaultValues: {
@@ -89,16 +90,13 @@ const ListProduct = ({ page, limit, products, setProductsState }) => {
       ),
       handleOk: async () => {
         const newData = methodsModalAdd.getValues()
-        newData.id = products.length + 1
         try {
-          await AxiosRequest.post(`products`, { ...newData })
-          const newDataState = [newData, ...products]
-          setProductsState(newDataState)
+          await dispatch(patchRequest(newData))
 
           methodsModalAdd.reset()
           handleCancel()
         } catch (error) {
-          console.error('Error deleting product:', error)
+          console.error('Error add product:', error)
         }
         handleCancel()
       },
@@ -108,7 +106,7 @@ const ListProduct = ({ page, limit, products, setProductsState }) => {
   const handleCancel = () => {
     setModal({ ...modal, isOpen: false })
   }
-  console.log(products)
+
   return (
     <div>
       {modal.isOpen && <Modal {...modal} />}
@@ -119,15 +117,8 @@ const ListProduct = ({ page, limit, products, setProductsState }) => {
         </Button>
       </AddCardStyled>
       <ProductListStyled>
-        {products?.map((product, index) => {
-          return (
-            <ProductCard
-              key={product.id}
-              product={product}
-              setDataState={setProductsState}
-              dataState={products}
-            />
-          )
+        {products?.map((product) => {
+          return <ProductCard key={product._id} product={product} />
         })}
       </ProductListStyled>
     </div>

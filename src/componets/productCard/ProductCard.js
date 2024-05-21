@@ -4,7 +4,6 @@ import Modal from '../../pages/Home/component/Modal/Modal'
 import Input from '../common/form/input/Input'
 
 import { FormProvider, useForm } from 'react-hook-form'
-import AxiosRequest from '../../API/Axios'
 
 import {
   ButtonGroupStyled,
@@ -30,9 +29,18 @@ import {
   UserStyled,
 } from './ProductCardStyle'
 
-const ProductCard = ({ product, setDataState, dataState }) => {
-  const [productState, setProductState] = useState({ ...product })
+import { useDispatch } from 'react-redux'
+
+import {
+  deleteRequest,
+  patchRequest,
+} from '../../saga/Products/Products.Action'
+
+const ProductCard = ({ product }) => {
+  const dispatch = useDispatch()
+
   const methodsModalEdit = useForm({})
+
   const [modal, setModal] = useState({
     isOpen: false,
     title: '',
@@ -41,12 +49,13 @@ const ProductCard = ({ product, setDataState, dataState }) => {
     handleCancel: () => {},
   })
 
+  //EDIT
   const handleShowModalEdit = () => {
     const Modalvalue = {
-      id: productState.id,
-      imageUrl: productState.imageUrl,
-      title: productState.title,
-      description: productState.description,
+      id: product.id,
+      imageUrl: product.imageUrl,
+      title: product.title,
+      description: product.description,
     }
     Object.keys(Modalvalue).forEach((key) => {
       methodsModalEdit.setValue(key, Modalvalue[key])
@@ -81,11 +90,8 @@ const ProductCard = ({ product, setDataState, dataState }) => {
       handleOk: async () => {
         const newProduct = methodsModalEdit.getValues()
         try {
-          await AxiosRequest.put(`products/${newProduct.id}`, {
-            ...newProduct,
-          })
-          setProductState(newProduct)
-          console.log(newProduct)
+          dispatch(patchRequest(newProduct))
+
           handleCancel()
         } catch (error) {
           console.error('Error updating product:', error)
@@ -95,6 +101,8 @@ const ProductCard = ({ product, setDataState, dataState }) => {
     })
   }
 
+  //DELETE
+
   const handleShowModalDelete = () => {
     setModal({
       isOpen: true,
@@ -102,9 +110,7 @@ const ProductCard = ({ product, setDataState, dataState }) => {
       content: 'Bạn có chắc chắn muốn xóa sản phẩm',
       handleOk: async () => {
         try {
-          await AxiosRequest.delete(`products/${product.id}`)
-          const res = dataState.filter((p) => p.id !== product.id)
-          setDataState(res)
+          dispatch(deleteRequest(product._id))
           handleCancel()
         } catch (error) {
           console.error('Error deleting product:', error)
@@ -136,16 +142,18 @@ const ProductCard = ({ product, setDataState, dataState }) => {
 
       <CardTopStyled>
         <CardImgWrapperStyled>
-          <CardImgStyled src={productState.imageUrl} />
+          <CardImgStyled src={product.imageUrl} />
         </CardImgWrapperStyled>
         <UserStyled>
           <UserAvtStyled src='card1.png' />
           <div>
-            <UserNameStyled>{product.username}</UserNameStyled>
+            <UserNameStyled>
+              {product.username} {product.id}
+            </UserNameStyled>
           </div>
         </UserStyled>
-        <ProductNameStyled>{productState.title}</ProductNameStyled>
-        <DescrioptionStyled>{productState.description}</DescrioptionStyled>
+        <ProductNameStyled>{product.title}</ProductNameStyled>
+        <DescrioptionStyled>{product.description}</DescrioptionStyled>
       </CardTopStyled>
 
       <CardBottomStyled>
